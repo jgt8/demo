@@ -1,5 +1,5 @@
 #!/bin/bash
 
-scriptdir=$(dirname $(readlink -f $0))
+basedir="$(cd "$(dirname $0)//.." && pwd)"
 
-java -cp $scriptdir/lib/*.jar jgt.demo.bowling.BowlingGame
+java -cp basedir/lib/*.jar jgt.demo.bowling.BowlingGame
