@@ -1,36 +1,30 @@
 package jgt.demo.bowling;
 
-import java.io.Console;
-import java.util.Arrays;
-
-import jgt.demo.bowling.BowlingGame.BowlingGameState;
 import jgt.demo.bowling.BowlingGame.GameStatus;
+
+import java.io.Console;
+import java.util.Formatter;
 
 public class BowlingConsole {
 
-    private static final String WELCOME = "something something \n"; // usage: enter integer rolls or commands A, B C
-    private static final String USAGE = "something something \n"; // usage: enter integer rolls or commands A, B C
+    private static final String USAGE = "At the prompt, enter each roll as a number between 0 and 10.%n";
+    private static final String WELCOME = "%nHI, WELCOME TO BOWLING ALONE. Here's how it works:%n  "
+            + USAGE + "  The system will keep track of your score.%n";
+
+    private final static String FIRST_ROLL_PROMPT = "%nOK, %s, lets bowl! Roll your first ball: ";
+    private final static String BAD_INPUT_MSG = "Invalid input.%n";
     private final static int MAX_INPUT_ERRORS = 3;
 
     private final Console console;
 
     public static void main(String[] args) {
 
-
-        // parse cmd line switches
-        // -q quiet output
-        // -i international scoring
-
         Console console = System.console();
         if (console == null) {
             exitOnError(1, "Console unavailable");
         } else {
             console.printf(WELCOME);
-
-            BowlingConsole bowlingConsole = new BowlingConsole(console); // TODO args
-            bowlingConsole.runGame();
-
-            // cleanup?
+            new BowlingConsole(console).runGame();
         }
     }
 
@@ -39,7 +33,7 @@ public class BowlingConsole {
     }
 
     private void runGame() {
-        String prompt = "Hi, please enter your name: ";
+        String prompt = "Please enter your name: ";
         String input = null;
         String userName = null;
 
@@ -50,7 +44,6 @@ public class BowlingConsole {
                 break;
             } else {
                 prompt = "Please enter a username of at least three characters: ";
-
             }
         }
         if (userName == null) {
@@ -58,44 +51,71 @@ public class BowlingConsole {
             exitOnError(2, "Bad user name input");
         }
 
-        BowlingGame game = new BowlingGame(userName);
-        BowlingGameState gameState;
-        int consecutiveInputErrors = 0;
+        boolean keepPlaying = true;
 
-        prompt = "OK, " + userName +", lets bowl! Roll your first ball: ";
-        while ((input = console.readLine(prompt)) != null
-                && consecutiveInputErrors < MAX_INPUT_ERRORS) {
-            try {
-                int rollScore = Integer.parseInt(input); // todo maybe trim whitespace
-                consecutiveInputErrors = 0;
-                gameState = game.onRoll(rollScore);
-                if (gameState.gameStatus == GameStatus.GAME_ERROR) {
-                    console.printf("Invalid input.\n");
-                    console.printf(USAGE);
+        while (keepPlaying) {
+            BowlingGame game = new BowlingGame(userName);
+            int consecutiveInputErrors = 0;
+
+            prompt = FIRST_ROLL_PROMPT;
+            while ((input = console.readLine(prompt, userName)) != null
+                    && consecutiveInputErrors < MAX_INPUT_ERRORS) {
+                try {
+                    int rollScore = Integer.parseInt(input.trim());
+                    consecutiveInputErrors = 0;
+                    game.onRoll(rollScore);
+                    if (game.gameStatus == GameStatus.GAME_ERROR) {
+                        console.printf("Game status: %s %n", game.gameStatus);
+                        console.printf(BAD_INPUT_MSG + USAGE);
+
+                    } else {
+                        showScoreBoard(game, console);
+                    }
+                } catch (NumberFormatException e1) {
+                    consecutiveInputErrors++;
+                    console.printf(BAD_INPUT_MSG + USAGE);
                 }
-                console.printf(formatGameState(gameState) +"\n"); // todo
-            } catch (NumberFormatException e1) {
-                consecutiveInputErrors++;
-                console.printf("Invalid input.\n");
-                console.printf(USAGE);
+
+                if (game.gameStatus == GameStatus.GAME_OVER) {
+                    console.printf("%n********%nGood bowling! You scored %d on that game.", game.currentScore);
+                    input = console.readLine("%nAnother game? (Y or N): ");
+                    if (input != null && input.trim().equalsIgnoreCase("Y")) {
+                        console.printf("One more game then.");
+                    } else {
+                        console.printf("Thanks for playing!%n");
+                        keepPlaying = false;
+                    }
+                    break;
+                } else {
+                    prompt = "%nRoll again: ";
+                }
             }
-            prompt = "Roll again: ";
-            // if game over, offer a new game
         }
         console.printf("Bye.\n\n");
     }
 
-    private String formatGameState(BowlingGameState state) {
-        StringBuffer s = new StringBuffer("Game status: ").append(state.gameStatus).append("\n")
-                .append("Player: ").append(state.playerID)
-                .append(" | Frame: ").append(state.currentFrame)
-                .append(" | Last Roll: ").append(state.rolls[state.currentRoll])
-                .append(" | Score: ").append(state.currentScore).append("\n")
-                .append("Rolls: ").append(Arrays.toString(state.rolls)).append("\n")
-                .append("FrameIndex: ").append(Arrays.toString(state.frameIndex)).append("\n")
-                .append("FrameScores: ").append(Arrays.toString(state.frameScores)).append("\n");
+    private void showScoreBoard(BowlingGame game, Console console) {
+        console.printf("Game status: %s %n", game.gameStatus);
+        console.printf("Player: %s | Frame: %d | Score: %d %n",
+                game.playerID, game.currentFrame+1, game.currentScore);
 
-        return s.toString();
+        String headerFmt = "%-6s %-10s %-5s%n";
+        String frameFmt = "%-6d %-10s %4d %n";
+        String rollFmt = "%2d ";
+
+        console.printf(headerFmt, "Frame", "Roll(s)", "Score");
+
+        for (int f = 0; f <= game.currentFrame; f++) {
+            StringBuilder rollsInFrame = new StringBuilder();
+            Formatter rollsFormatter = new Formatter(rollsInFrame);
+            int frameEnd = (f == game.FINAL_FRAME || f == game.currentFrame)
+                    ? game.currentRollNum
+                    : game.frameToRollIndex[f+1];
+            for ( int r = game.frameToRollIndex[f]; r < frameEnd; r++) {
+                rollsFormatter.format(rollFmt, game.rolls[r]);
+            }
+            console.printf(frameFmt, f+1, rollsInFrame.toString(), game.frameScores[f]);
+        }
     }
 
     private static void exitOnError(int code, String message) {

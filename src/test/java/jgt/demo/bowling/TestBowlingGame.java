@@ -1,10 +1,9 @@
 package jgt.demo.bowling;
 
+import jgt.demo.bowling.BowlingGame.GameStatus;
 import org.junit.Test;
-import org.junit.Assert.*;
 
 import java.util.Arrays;
-import jgt.demo.bowling.BowlingGame.GameStatus;
 
 import static org.junit.Assert.assertEquals;
 
