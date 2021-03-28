@@ -22,6 +22,10 @@ public class BowlingConsole {
     public static void main(String[] args) {
 
         boolean validArgs = parseArgs(args);
+        if (!validArgs) {
+            System.err.println("Input error.");
+            System.exit(1);
+        }
 
         Console console = System.console();
         if (console == null) {
