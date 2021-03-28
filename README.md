@@ -30,14 +30,14 @@ Frame  Roll(s)    Score
 Roll again: 
 ```
 
-Since no specifics are present in the requirements, Frames are presented vertically rather than in 
+Since no specifics are present in the requirements, frames are presented vertically rather than in 
 the traditional horizontal format. Further, the 
 non-numeric marks often used to flag strikes, spares, etc. are here avoided. These seem to be 
 particularly designed to facilitate manual scoring on paper, and would present a kind of visual
 skeuomorphism for a tool such as this. Likewise, the "superstitious" withholding of score display 
 while a strike run is in progress is ignored. It is not anticipated that superstitious or finicky, 
 tradition-minded bowlers are likely users at this time. All of this can be revisited after user 
-input, of course.
+feedback, of course.
 
 ## To Build and Run
 A wrapper script is included to run the tool in a unix-like environment. The script expects to 
