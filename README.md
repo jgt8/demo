@@ -10,11 +10,6 @@ Details of how to score a game of bowling:
 * https://www.kidslearntobowl.com/how-to-keep-score/
 
 ## Discussion
-The anticipated usage of a single-user scoring tool is that it will be invoked, and scores will be
-entered manually, by a user at a console. However, a bowling scorekeeper is a more general 
-application that may be useful as a plugin in other contexts. The console 
-handling and game management concerns are separated here.
-
 BowlingGame accepts a username and a desired number of frames to play. If the username is 
 omitted, a default "anonymous" value is set. If the frame count is omitted, the standard 10 
 frames is set. The score is updated on each roll, with bonus frames re-scored as the 
@@ -57,6 +52,11 @@ mvn clean install
 A symlink could be installed in a user's own ~/bin folder, and should work as well.
 
 ## Technical Notes
+The anticipated usage of a single-user scoring tool is that it will be invoked, and scores will be
+entered manually, by a user at a console. However, a bowling scorekeeper is a more general
+application that may be useful as a plugin in other contexts. The console
+handling and game management concerns are separated here.
+
 At present geared to a single-user, single-threaded context, BowlingGame is not thread-safe. It 
 maintains, and indeed _exposes_ mutable internal state. Thread-safety would require some trivial 
 modifications, some of which are noted in a comment at the top of BowlingGame.java.
