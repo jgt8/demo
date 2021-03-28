@@ -7,7 +7,7 @@ import java.util.Formatter;
 
 public class BowlingConsole {
 
-    private static final String USAGE = "At the prompt, enter each roll as a number between 0 and 10.%n";
+    private static final String USAGE = "At the prompt, enter each roll as a number between 0 and 10, %nRolls must to 10 or less in each frame except the last.%n";
     private static final String WELCOME = "%nHI, WELCOME TO BOWLING ALONE. Here's how it works:%n  "
             + USAGE + "  The system will keep track of your score.%n";
 
@@ -15,9 +15,13 @@ public class BowlingConsole {
     private final static String BAD_INPUT_MSG = "Invalid input.%n";
     private final static int MAX_INPUT_ERRORS = 3;
 
+    private static int numFrames = BowlingGame.STANDARD_FRAME_COUNT;
+
     private final Console console;
 
     public static void main(String[] args) {
+
+        boolean validArgs = parseArgs(args);
 
         Console console = System.console();
         if (console == null) {
@@ -26,6 +30,31 @@ public class BowlingConsole {
             console.printf(WELCOME);
             new BowlingConsole(console).runGame();
         }
+    }
+
+    /**
+     * Process an option, unadvertised in Usage message, to select fewer than 10 frames. Useful for test runs.
+     */
+    private static boolean parseArgs(String[] args) {
+        int n = -1;
+        boolean argOK = true;
+        if (args.length > 0) {
+            if (args.length == 1) {
+                try {
+                    n = Integer.parseInt(args[0].trim());
+                } catch (NumberFormatException e) {
+                    argOK = false;
+                }
+                if (n < 2 || n > 10) {
+                    argOK = false;
+                } else {
+                    numFrames = n;
+                }
+            } else {
+                argOK = true;
+            }
+        }
+        return argOK;
     }
 
     private BowlingConsole(Console console) {
@@ -54,7 +83,7 @@ public class BowlingConsole {
         boolean keepPlaying = true;
 
         while (keepPlaying) {
-            BowlingGame game = new BowlingGame(userName);
+            BowlingGame game = new BowlingGame(userName, numFrames);
             int consecutiveInputErrors = 0;
 
             prompt = FIRST_ROLL_PROMPT;

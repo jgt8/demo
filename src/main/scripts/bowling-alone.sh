@@ -2,4 +2,4 @@
 
 basedir="$(cd "$(dirname $0)//.." && pwd)"
 
-java -cp basedir/lib/*.jar jgt.demo.bowling.BowlingGame
+java -cp $basedir/lib/*.jar jgt.demo.bowling.BowlingConsole $@
