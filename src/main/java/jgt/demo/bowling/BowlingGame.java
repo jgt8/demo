@@ -4,6 +4,13 @@ public class BowlingGame {
 
     protected String playerID;
 
+    /*
+     * Internal game state is here exposed to package-visibility to simplify the writing of
+     * the console client and tests. In a multi-user setting, these would need to be held private,
+     * and a separate state object containing independent copies of this data published externally.
+     * A version of this approach returning a BowlingGameState object from onRoll() can be
+     * inspected at commit f3f9cc87d. This was removed for simplicity in the current context.
+     */
     protected int[] rolls;
     protected int currentRollNum = 0; // last filled index in rolls[]
 
@@ -64,7 +71,7 @@ public class BowlingGame {
 
     private boolean onValidRoll(int roll) {
         if (advanceFrame(currentFrame)) {
-            frameToRollIndex[++currentFrame] = currentRollNum + 1; // todo why setting this twice?
+            frameToRollIndex[++currentFrame] = currentRollNum + 1; // todo: setting this twice, hmm
         }
         return roll >=0
                 && (frameSum(currentFrame, roll) <= ALL_PINS

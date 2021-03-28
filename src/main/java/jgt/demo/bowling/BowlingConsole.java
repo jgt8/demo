@@ -7,7 +7,8 @@ import java.util.Formatter;
 
 public class BowlingConsole {
 
-    private static final String USAGE = "At the prompt, enter each roll as a number between 0 and 10, %nRolls must to 10 or less in each frame except the last.%n";
+    private static final String USAGE = "At the prompt, enter each roll as a number between 0 and 10, " +
+            "%n  Rolls must to 10 or less in each frame except the last.%n";
     private static final String WELCOME = "%nHI, WELCOME TO BOWLING ALONE. Here's how it works:%n  "
             + USAGE + "  The system will keep track of your score.%n";
 
@@ -91,8 +92,7 @@ public class BowlingConsole {
             int consecutiveInputErrors = 0;
 
             prompt = FIRST_ROLL_PROMPT;
-            while ((input = console.readLine(prompt, userName)) != null
-                    && consecutiveInputErrors < MAX_INPUT_ERRORS) {
+            while ((input = console.readLine(prompt, userName)) != null) {
                 try {
                     int rollScore = Integer.parseInt(input.trim());
                     consecutiveInputErrors = 0;
@@ -106,7 +106,12 @@ public class BowlingConsole {
                     }
                 } catch (NumberFormatException e1) {
                     consecutiveInputErrors++;
-                    console.printf(BAD_INPUT_MSG + USAGE);
+                    if (consecutiveInputErrors > MAX_INPUT_ERRORS) {
+                        console.printf("Too many errors, exiting.%n%n");
+                        System.exit(1);
+                    } else {
+                        console.printf(BAD_INPUT_MSG + USAGE);
+                    }
                 }
 
                 if (game.gameStatus == GameStatus.GAME_OVER) {
