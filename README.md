@@ -25,7 +25,7 @@ Game status: GAME_ON
 Player: 123 | Frame: 2 | Score: 32
 Frame  Roll(s)    Score
 1       9  1        21
-2      11           32
+2       8           29
 
 Roll again: 
 ```
