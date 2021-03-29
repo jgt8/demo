@@ -24,8 +24,8 @@ output to provide an ongoing game status snapshot to the user. The output format
 Game status: GAME_ON
 Player: 123 | Frame: 2 | Score: 32
 Frame  Roll(s)    Score
-1       9  1        21
-2       8           29
+1       9  1        18
+2       8           26
 
 Roll again: 
 ```
