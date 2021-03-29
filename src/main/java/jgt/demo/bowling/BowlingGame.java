@@ -105,16 +105,16 @@ public class BowlingGame {
 
     /**
      * Recalculate the whole score array rather than manage marks of non-final frame scoring.
-     * Fine for small data sets. Enters and updates frame scores as new roll is delivered.
+     * Fine for the TINY data set in this context. Enters and updates frame scores as new roll is delivered.
      * Scorecard rendering preferences are left to presentation code.
      */
     private int score() {
         int score = 0;
-        int currentFrame = 0;
+        int frameNum = 0;
         int rollNum = 0;
 
         while (rollNum < currentRollNum) {
-            frameToRollIndex[currentFrame] = rollNum;
+            frameToRollIndex[frameNum] = rollNum;
 
             if (isStrike(rollNum)) {
                 score += bonusFrameScore(rollNum);
@@ -126,9 +126,9 @@ public class BowlingGame {
                 score += openFrameScore(rollNum);
                 rollNum += FRAME_SIZE;
             }
-            frameScores[currentFrame] = score;
-            if (currentFrame == FINAL_FRAME) break;
-            else currentFrame++;
+            frameScores[frameNum] = score;
+            if (frameNum == FINAL_FRAME) break;
+            else frameNum++;
         }
         return score;
     }
