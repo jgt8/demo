@@ -64,10 +64,10 @@ public class TestBowlingConsole {
             assertEquals("Invalid input.", s);
 
             s = testReader.readLine();
-            assertEquals("At the prompt, enter each roll as a number between 0 and 10, ", s);
+            assertEquals("At the prompt, enter each roll as a number between 0 and 10. ", s);
 
             s = testReader.readLine();
-            assertEquals("  Rolls must be equal to 10 or less in each frame except the last.", s);
+            assertEquals("Rolls must be equal to 10 or less in each frame except the last.", s);
             blank = testReader.readLine();
 
             s = testReader.readLine();
