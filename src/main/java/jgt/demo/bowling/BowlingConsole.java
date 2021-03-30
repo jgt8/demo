@@ -8,7 +8,7 @@ import java.util.Formatter;
 public class BowlingConsole {
 
     private static final String USAGE = "At the prompt, enter each roll as a number between 0 and 10, " +
-            "%n  Rolls must to 10 or less in each frame except the last.%n";
+            "%n  Rolls must be equal to 10 or less in each frame except the last.%n";
     private static final String WELCOME = "%nHI, WELCOME TO BOWLING ALONE. Here's how it works:%n  "
             + USAGE + "  The system will keep track of your score.%n";
 
