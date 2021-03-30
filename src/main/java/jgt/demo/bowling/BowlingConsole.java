@@ -2,7 +2,7 @@ package jgt.demo.bowling;
 
 import jgt.demo.bowling.BowlingGame.GameStatus;
 
-import java.io.Console;
+import java.io.*;
 import java.util.Formatter;
 
 public class BowlingConsole {
@@ -18,23 +18,18 @@ public class BowlingConsole {
 
     private static int numFrames = BowlingGame.STANDARD_FRAME_COUNT;
 
-    private final Console console;
+    private final ConsoleWrapper console;
 
     public static void main(String[] args) {
-
         boolean validArgs = parseArgs(args);
         if (!validArgs) {
             System.err.println("Input error.");
             System.exit(1);
         }
 
-        Console console = System.console();
-        if (console == null) {
-            exitOnError(1, "Console unavailable");
-        } else {
-            console.printf(WELCOME);
-            new BowlingConsole(console).runGame();
-        }
+        ConsoleWrapper console = new ConsoleWrapper(System.console());
+        console.printf(WELCOME);
+        new BowlingConsole(console).runGame();
     }
 
     /**
@@ -62,11 +57,17 @@ public class BowlingConsole {
         return argOK;
     }
 
-    private BowlingConsole(Console console) {
+    private BowlingConsole(ConsoleWrapper console) {
         this.console =  console;
     }
 
-    private void runGame() {
+    // only used for testing
+    protected BowlingConsole(ConsoleWrapper console, int nFrames) {
+        this.console =  console;
+        numFrames = nFrames;
+    }
+
+    protected void runGame() {
         String prompt = "Please enter your name: ";
         String input = null;
         String userName = null;
@@ -132,7 +133,7 @@ public class BowlingConsole {
         console.printf("Bye.\n\n");
     }
 
-    private void showScoreBoard(BowlingGame game, Console console) {
+    private void showScoreBoard(BowlingGame game, ConsoleWrapper console) {
         console.printf("Game status: %s %n", game.gameStatus);
         console.printf("Player: %s | Frame: %d | Score: %d %n",
                 game.playerID, game.currentFrame+1, game.currentScore);
