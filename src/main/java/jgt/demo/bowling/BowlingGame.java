@@ -1,5 +1,7 @@
 package jgt.demo.bowling;
 
+import java.util.Arrays;
+
 public class BowlingGame {
 
     protected String playerID;
@@ -15,13 +17,13 @@ public class BowlingGame {
     protected int currentRollNum = 0; // last filled index in rolls[]
 
     protected int[] frameToRollIndex; // for each frame, index of its first roll in rolls[]
-    protected int currentFrame = 0;
+    protected int currentFrame = 1;
 
     protected int[] frameScores; // cumulative score at each frame
     protected int currentScore = 0; // total score
 
     protected final int ALL_PINS = 10;
-    protected final int FIRST_FRAME = 0;
+    protected final int FIRST_FRAME = 1; // NOTE: caunting frames from 1 not 0, helps manage fullyScoredFrame
     protected final int FINAL_FRAME;
     protected final int FRAME_SIZE = 2;
     protected final int STRIKE_FRAME_SIZE = 1;
@@ -52,16 +54,17 @@ public class BowlingGame {
     public BowlingGame(String userName, int numFrames) {
         playerID = userName;
         rolls = new int[numFrames * 2 + 1];
-        frameToRollIndex = new int[numFrames];
-        frameScores = new int[numFrames];
-        FINAL_FRAME = numFrames - 1;
+        frameToRollIndex = new int[numFrames + 1];
+        frameScores = new int[numFrames + 1];
+        FINAL_FRAME = numFrames;
     }
 
     public void onRoll(int roll) {
         if (gameStatus != GameStatus.GAME_OVER) {
             if (onValidRoll(roll)) {
-                rolls[currentRollNum++] = roll;
+                rolls[currentRollNum] = roll;
                 currentScore = score();
+                currentRollNum++;
                 gameStatus = gameStatus();
             } else {
                 gameStatus = GameStatus.GAME_ERROR;
@@ -71,7 +74,7 @@ public class BowlingGame {
 
     private boolean onValidRoll(int roll) {
         if (advanceFrame(currentFrame)) {
-            frameToRollIndex[++currentFrame] = currentRollNum + 1; // todo: setting this twice, hmm
+            frameToRollIndex[++currentFrame] = currentRollNum ;
         }
         return roll >=0
                 && (frameSum(currentFrame, roll) <= ALL_PINS
@@ -103,30 +106,35 @@ public class BowlingGame {
         return sum;
     }
 
+    int fullyScoredFrame = 0;
+
     /**
-     * Recalculate the whole score array rather than manage marks of non-final frame scoring.
-     * Fine for the TINY data set in this context. Enters and updates frame scores as new roll is delivered.
-     * Scorecard rendering preferences are left to presentation code.
+     * Incrementally recalculate scores starting with the earliest of any incompletely
+     * scored frame or the current frame. Enters and updates frame scores as each new roll
+     * is delivered. Scorecard rendering preferences are left to presentation code.
      */
     private int score() {
-        int score = 0;
-        int frameNum = 0;
-        int rollNum = 0;
+        int score = frameScores[fullyScoredFrame];
+        int frameNum = fullyScoredFrame+1;
+        int rollNum = frameToRollIndex[frameNum];
 
-        while (rollNum < currentRollNum) {
-            frameToRollIndex[frameNum] = rollNum;
-
+        while (rollNum <= currentRollNum) {
+            boolean isBonusFrame = false;
             if (isStrike(rollNum)) {
                 score += bonusFrameScore(rollNum);
                 rollNum += STRIKE_FRAME_SIZE;
+                isBonusFrame = true;
             } else if (isSpare(rollNum)) {
                 score += bonusFrameScore(rollNum);
                 rollNum += FRAME_SIZE;
+                isBonusFrame = true;
             } else {
                 score += openFrameScore(rollNum);
                 rollNum += FRAME_SIZE;
             }
             frameScores[frameNum] = score;
+            if (isFullyScored(frameNum, isBonusFrame)) fullyScoredFrame = frameNum;
+
             if (frameNum == FINAL_FRAME) break;
             else frameNum++;
         }
@@ -159,6 +167,12 @@ public class BowlingGame {
 
     private int openFrameScore(int rollNum) {
         return rolls[rollNum] + rolls[rollNum+1];
+    }
+
+    // all frames are fully scored 2 rolls after of the frame's first roll
+    boolean isFullyScored(int frameNum, boolean isBonusFrame) {
+        int extraFrame = isBonusFrame ? 1 : 0;
+        return currentRollNum > frameToRollIndex[frameNum] + extraFrame;
     }
 
 }

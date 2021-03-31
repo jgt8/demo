@@ -136,7 +136,7 @@ public class BowlingConsole {
     private void showScoreBoard(BowlingGame game, ConsoleWrapper console) {
         console.printf("Game status: %s %n", game.gameStatus);
         console.printf("Player: %s | Frame: %d | Score: %d %n",
-                game.playerID, game.currentFrame+1, game.currentScore);
+                game.playerID, game.currentFrame, game.currentScore);
 
         String headerFmt = "%-6s %-10s %-5s%n";
         String frameFmt = "%-6d %-10s %4d %n";
@@ -144,16 +144,16 @@ public class BowlingConsole {
 
         console.printf(headerFmt, "Frame", "Roll(s)", "Score");
 
-        for (int f = 0; f <= game.currentFrame; f++) {
+        for (int frame = 1; frame <= game.currentFrame; frame++) {
             StringBuilder rollsInFrame = new StringBuilder();
             Formatter rollsFormatter = new Formatter(rollsInFrame);
-            int frameEnd = (f == game.FINAL_FRAME || f == game.currentFrame)
+            int frameEnd = (frame == game.FINAL_FRAME || frame == game.currentFrame)
                     ? game.currentRollNum
-                    : game.frameToRollIndex[f+1];
-            for ( int r = game.frameToRollIndex[f]; r < frameEnd; r++) {
+                    : game.frameToRollIndex[frame+1];
+            for ( int r = game.frameToRollIndex[frame]; r < frameEnd; r++) {
                 rollsFormatter.format(rollFmt, game.rolls[r]);
             }
-            console.printf(frameFmt, f+1, rollsInFrame.toString(), game.frameScores[f]);
+            console.printf(frameFmt, frame, rollsInFrame.toString(), game.frameScores[frame]);
         }
     }
 

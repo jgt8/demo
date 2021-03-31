@@ -66,9 +66,9 @@ public class TestBowlingGame {
         game.onRoll(4);
         assertEquals(GameStatus.GAME_ON, game.gameStatus);
         assertEquals(4, game.rolls[1]);
-        assertEquals(8, game.frameScores[0]);
+        assertEquals(8, game.frameScores[1]);
         assertEquals(8, game.currentScore);
-        assertEquals(0, game.currentFrame);
+        assertEquals(1, game.currentFrame);
     }
 
     @Test
@@ -78,9 +78,9 @@ public class TestBowlingGame {
         game.onRoll(5);
         assertEquals(GameStatus.GAME_ON, game.gameStatus);
         assertEquals(5, game.rolls[2]);
-        assertEquals(15, game.frameScores[0]);
+        assertEquals(15, game.frameScores[1]);
         assertEquals(20, game.currentScore);
-        assertEquals(1, game.currentFrame);
+        assertEquals(2, game.currentFrame);
     }
 
     @Test
@@ -90,9 +90,9 @@ public class TestBowlingGame {
         game.onRoll(5);
         assertEquals(GameStatus.GAME_ON, game.gameStatus);
         assertEquals(5, game.rolls[2]);
-        assertEquals(20, game.frameScores[0]);
+        assertEquals(20, game.frameScores[1]);
         assertEquals(30, game.currentScore);
-        assertEquals(1, game.currentFrame);
+        assertEquals(2, game.currentFrame);
     }
 
 //    @Test
@@ -105,7 +105,7 @@ public class TestBowlingGame {
         int[] rolls = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         doRolls(game, rolls);
         assertEquals(GameStatus.GAME_OVER, game.gameStatus);
-        assertEquals(4, game.currentFrame);
+        assertEquals(5, game.currentFrame);
         assertEquals(0, game.currentScore);
     }
 
@@ -114,7 +114,14 @@ public class TestBowlingGame {
         int[] rolls = new int[] {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
         doRolls(game, rolls);
         assertEquals(GameStatus.GAME_OVER, game.gameStatus);
-        assertEquals(4, game.currentFrame);
+        assertEquals(5, game.currentFrame);
+
+        assertEquals(2, game.frameScores[1]);
+        assertEquals(4, game.frameScores[2]);
+        assertEquals(6, game.frameScores[3]);
+        assertEquals(8, game.frameScores[4]);
+        assertEquals(10, game.frameScores[5]);
+
         assertEquals(10, game.currentScore);
     }
 
@@ -124,7 +131,7 @@ public class TestBowlingGame {
         int[] rolls = new int[] {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10};
         doRolls(game, rolls);
         assertEquals(GameStatus.GAME_OVER, game.gameStatus);
-        assertEquals(9, game.currentFrame);
+        assertEquals(10, game.currentFrame);
         assertEquals(300, game.currentScore);
     }
 
@@ -133,12 +140,11 @@ public class TestBowlingGame {
         int[] rolls = new int[] {0, 1, 5, 5, 10, 3, 4, 10, 3, 2};
         doRolls(game, rolls);
         assertEquals(GameStatus.GAME_OVER, game.gameStatus);
-        assertEquals(4, game.currentFrame);
-        assertEquals(1, game.frameScores[0]);
-        assertEquals(21, game.frameScores[1]);
-        assertEquals(38, game.frameScores[2]);
-        assertEquals(45, game.frameScores[3]);
-        assertEquals(60, game.frameScores[4]);
+        assertEquals(1, game.frameScores[1]);
+        assertEquals(21, game.frameScores[2]);
+        assertEquals(38, game.frameScores[3]);
+        assertEquals(45, game.frameScores[4]);
+        assertEquals(60, game.frameScores[5]);
         assertEquals(60, game.currentScore);
     }
 
@@ -147,7 +153,7 @@ public class TestBowlingGame {
         int[] rolls = new int[] {0, 1, 5, 5, 10, 3, 4, 5, 5, 2};
         doRolls(game, rolls);
         assertEquals(GameStatus.GAME_OVER, game.gameStatus);
-        assertEquals(4, game.currentFrame);
+        assertEquals(5, game.currentFrame);
         assertEquals(57, game.currentScore);
     }
 
