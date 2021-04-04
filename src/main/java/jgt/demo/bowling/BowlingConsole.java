@@ -2,7 +2,6 @@ package jgt.demo.bowling;
 
 import jgt.demo.bowling.BowlingGame.GameStatus;
 
-import java.io.*;
 import java.util.Formatter;
 
 public class BowlingConsole {
@@ -90,6 +89,7 @@ public class BowlingConsole {
 
         while (keepPlaying) {
             BowlingGame game = new BowlingGame(userName, numFrames);
+            BowlingGame.Scoreboard scoreboard = game.scoreboard();
             int consecutiveInputErrors = 0;
 
             prompt = FIRST_ROLL_PROMPT;
@@ -97,13 +97,13 @@ public class BowlingConsole {
                 try {
                     int rollScore = Integer.parseInt(input.trim());
                     consecutiveInputErrors = 0;
-                    game.onRoll(rollScore);
-                    if (game.gameStatus == GameStatus.GAME_ERROR) {
-                        console.printf("Game status: %s %n", game.gameStatus);
+                    scoreboard = game.onRoll(rollScore);
+                    if (scoreboard.gameStatus == GameStatus.GAME_ERROR) {
+                        console.printf("Game status: %s %n", scoreboard.gameStatus);
                         console.printf(BAD_INPUT_MSG + USAGE);
 
                     } else {
-                        showScoreBoard(game, console);
+                        showScoreboard(scoreboard, console);
                     }
                 } catch (NumberFormatException e1) {
                     consecutiveInputErrors++;
@@ -115,8 +115,8 @@ public class BowlingConsole {
                     }
                 }
 
-                if (game.gameStatus == GameStatus.GAME_OVER) {
-                    console.printf("%n********%nGood bowling! You scored %d on that game.", game.currentScore);
+                if (scoreboard.gameStatus == GameStatus.GAME_OVER) {
+                    console.printf("%n********%nGood bowling! You scored %d on that game.", scoreboard.currentScore);
                     input = console.readLine("%nAnother game? (Y or N): ");
                     if (input != null && input.trim().equalsIgnoreCase("Y")) {
                         console.printf("One more game then.");
@@ -133,10 +133,10 @@ public class BowlingConsole {
         console.printf("Bye.\n\n");
     }
 
-    private void showScoreBoard(BowlingGame game, ConsoleWrapper console) {
-        console.printf("Game status: %s %n", game.gameStatus);
+    private void showScoreboard(BowlingGame.Scoreboard scoreboard, ConsoleWrapper console) {
+        console.printf("Game status: %s %n", scoreboard.gameStatus);
         console.printf("Player: %s | Frame: %d | Score: %d %n",
-                game.playerID, game.currentFrame, game.currentScore);
+                scoreboard.playerID, scoreboard.currentFrame, scoreboard.currentScore);
 
         String headerFmt = "%-6s %-10s %-5s%n";
         String frameFmt = "%-6d %-10s %4d %n";
@@ -144,16 +144,16 @@ public class BowlingConsole {
 
         console.printf(headerFmt, "Frame", "Roll(s)", "Score");
 
-        for (int frame = 1; frame <= game.currentFrame; frame++) {
+        for (int frame = scoreboard.FIRST_FRAME; frame <= scoreboard.currentFrame; frame++) {
             StringBuilder rollsInFrame = new StringBuilder();
             Formatter rollsFormatter = new Formatter(rollsInFrame);
-            int frameEnd = (frame == game.FINAL_FRAME || frame == game.currentFrame)
-                    ? game.currentRollNum
-                    : game.frameToRollIndex[frame+1];
-            for ( int r = game.frameToRollIndex[frame]; r < frameEnd; r++) {
-                rollsFormatter.format(rollFmt, game.rolls[r]);
+            int frameEnd = (frame == scoreboard.FINAL_FRAME || frame == scoreboard.currentFrame)
+                    ? scoreboard.currentRollNum
+                    : scoreboard.frameToRollIndex[frame+1];
+            for ( int r = scoreboard.frameToRollIndex[frame]; r < frameEnd; r++) {
+                rollsFormatter.format(rollFmt, scoreboard.rolls[r]);
             }
-            console.printf(frameFmt, frame, rollsInFrame.toString(), game.frameScores[frame]);
+            console.printf(frameFmt, frame, rollsInFrame.toString(), scoreboard.frameScores[frame]);
         }
     }
 

@@ -4,36 +4,32 @@ import java.util.Arrays;
 
 public class BowlingGame {
 
-    protected String playerID;
+    private String playerID;
 
     /*
-     * Internal game state is here exposed to package-visibility to simplify the writing of
-     * the console client and tests. In a multi-user setting, these would need to be held private,
-     * and a separate state object containing independent copies of this data published externally.
-     * A version of this approach returning a BowlingGameState object from onRoll() can be
-     * inspected at commit f3f9cc87d. This was removed for simplicity in the current context.
+     * Internal game state is mutable and private.
      */
-    protected int[] rolls;
-    protected int currentRollNum = 0; // last filled index in rolls[]
+    private int[] rolls;
+    private int currentRollNum = 0; // last filled index in rolls[]
 
-    protected int[] frameToRollIndex; // for each frame, index of its first roll in rolls[]
-    protected int currentFrame = 1;
+    private int[] frameToRollIndex; // for each frame, index of its first roll in rolls[]
+    private int currentFrame = 1;
 
-    protected int[] frameScores; // cumulative score at each frame
-    protected int currentScore = 0; // total score
+    private int[] frameScores; // cumulative score at each frame
+    private int currentScore = 0; // total score
 
-    protected final int ALL_PINS = 10;
-    protected final int FIRST_FRAME = 1; // NOTE: caunting frames from 1 not 0, helps manage fullyScoredFrame
-    protected final int FINAL_FRAME;
-    protected final int FRAME_SIZE = 2;
-    protected final int STRIKE_FRAME_SIZE = 1;
-    protected final int FINAL_FRAME_MAX_SIZE = 3;
-    protected final int FINAL_FRAME_MAX_SCORE = 30;
+    private final int FIRST_FRAME = 1; // NOTE: caunting frames from 1 not 0, helps manage fullyScoredFrame
+    private final int FINAL_FRAME;
 
-    protected static final int STANDARD_FRAME_COUNT = 10;
-    protected static final String ANON_USER = "AnonymousCoward";
+    public static final int ALL_PINS = 10;
+    public static final int FRAME_SIZE = 2;
+    public static final int STRIKE_FRAME_SIZE = 1;
+    public static final int FINAL_FRAME_MAX_SIZE = 3;
+    public static final int FINAL_FRAME_MAX_SCORE = 30;
+    public static final int STANDARD_FRAME_COUNT = 10;
 
-    protected GameStatus gameStatus = GameStatus.GAME_ON;
+    private static final String ANON_USER = "AnonymousCoward";
+    private GameStatus gameStatus = GameStatus.GAME_ON;
 
     public enum GameStatus {
         GAME_ON, GAME_OVER, GAME_ERROR;
@@ -59,7 +55,12 @@ public class BowlingGame {
         FINAL_FRAME = numFrames;
     }
 
-    public void onRoll(int roll) {
+    /**
+     * Accept a player's roll and update the score
+     * @param roll
+     * @return a snapshot of the game's scoreboard after applying the roll
+     */
+    public Scoreboard onRoll(int roll) {
         if (gameStatus != GameStatus.GAME_OVER) {
             if (onValidRoll(roll)) {
                 rolls[currentRollNum] = roll;
@@ -70,6 +71,7 @@ public class BowlingGame {
                 gameStatus = GameStatus.GAME_ERROR;
             }
         }
+        return new Scoreboard();
     }
 
     private boolean onValidRoll(int roll) {
@@ -175,4 +177,30 @@ public class BowlingGame {
         return currentRollNum > frameToRollIndex[frameNum] + extraFrame;
     }
 
+    /**
+     * A snapshot of the current game state. Mostly immutable.
+     */
+    public class Scoreboard {
+        public final String playerID = BowlingGame.this.playerID;
+        public final GameStatus gameStatus = BowlingGame.this.gameStatus;
+
+        protected final int FIRST_FRAME = BowlingGame.this.FIRST_FRAME;
+        protected final int FINAL_FRAME = BowlingGame.this.FINAL_FRAME;
+
+        protected final int currentRollNum = BowlingGame.this.currentRollNum;
+        public final int currentFrame = BowlingGame.this.currentFrame;
+
+        public final int[] rolls = Arrays.copyOf(BowlingGame.this.rolls, BowlingGame.this.rolls.length);
+        public final int[] frameToRollIndex = Arrays.copyOf(BowlingGame.this.frameToRollIndex, BowlingGame.this.frameToRollIndex.length);
+
+        public final int[] frameScores = Arrays.copyOf(BowlingGame.this.frameScores, BowlingGame.this.frameScores.length);
+        public final int currentScore = BowlingGame.this.currentScore;
+    }
+
+    /**
+     * @return a copy of the game state
+     */
+    public Scoreboard scoreboard() {
+        return new Scoreboard();
+    }
 }
